@@ -1,6 +1,8 @@
 import React from 'react';
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
+  const navigate = useNavigate();
   return (
     <>
       {/* Tailwind CSS via CDN for standalone preview - remove in production and use your own setup */}
@@ -16,7 +18,7 @@ const HomePage = () => {
           }
         `}
       </style>
-
+      
       <div className="tailwind-ready min-h-screen bg-slate-50">
         {/* NAVBAR */}
         <nav className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
@@ -47,12 +49,12 @@ const HomePage = () => {
             <div className="flex items-center gap-x-4">
               {/* Small Login Button as requested */}
               <button 
-                onClick={() => alert('Login modal would open here (Patient / Doctor / Admin)')}
-                className="text-sm font-semibold px-6 py-2.5 border border-slate-300 hover:border-slate-400 rounded-3xl flex items-center gap-x-2 transition-all active:scale-95"
-              >
-                <span className="text-emerald-600">🔑</span>
-                <span>Login</span>
-              </button>
+      onClick={() => navigate("/login")}
+      className="text-sm font-semibold px-6 py-2.5 border border-slate-300 hover:border-slate-400 rounded-3xl flex items-center gap-x-2 transition-all active:scale-95"
+    >
+      <span className="text-emerald-600">🔑</span>
+      <span>Login</span>
+    </button>
 
               {/* Secondary CTA */}
               <button 
@@ -322,7 +324,13 @@ const HomePage = () => {
                     <li className="flex gap-3 items-center"><span className="text-emerald-400">✓</span> Generate compliance reports</li>
                     <li className="flex gap-3 items-center"><span className="text-emerald-400">✓</span> Audit blockchain logs</li>
                   </ul>
-                  <button className="mt-10 text-sm font-medium text-amber-600 group-hover:underline">Preview Admin Dashboard →</button>
+                  
+                  <button
+  onClick={() => navigate("/admin")}
+  className="mt-10 text-sm font-medium text-amber-600 hover:underline"
+>
+  Preview Admin Dashboard →
+</button>
                 </div>
               </div>
             </div>
@@ -384,7 +392,7 @@ const HomePage = () => {
               Join the waitlist or login to explore the full platform
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-10 py-5 bg-white text-emerald-700 font-semibold rounded-3xl text-lg">Login to your dashboard</button>
+              <button onClick={() => navigate("/login")} className="px-10 py-5 bg-white text-emerald-700 font-semibold rounded-3xl text-lg">Login to your dashboard</button>
               <button className="px-10 py-5 border border-white text-white font-semibold rounded-3xl text-lg hover:bg-white/10">Join the waitlist</button>
             </div>
             <p className="text-xs text-emerald-200 mt-8">Available for Patients • Doctors • Hospital Admins</p>
