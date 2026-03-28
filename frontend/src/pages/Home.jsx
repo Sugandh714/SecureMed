@@ -282,7 +282,12 @@ const HomePage = () => {
                     <li className="flex gap-3 items-center"><span className="text-emerald-400">✓</span> Set time limits &amp; revoke access</li>
                     <li className="flex gap-3 items-center"><span className="text-emerald-400">✓</span> View on-chain activity log</li>
                   </ul>
-                  <button className="mt-10 text-sm font-medium text-pink-600 group-hover:underline">Preview Patient Dashboard →</button>
+                  <button
+                    onClick={() => navigate("/dashboard")}
+                    className="mt-10 text-sm font-medium text-pink-600 group-hover:underline"
+                  >
+                    Preview Patient Dashboard →
+                  </button>
                 </div>
               </div>
 
