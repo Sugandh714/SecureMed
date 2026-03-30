@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ShieldCheck, User, Stethoscope, UserCog, Eye, EyeOff } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [role, setRole] = useState('patient'); // patient, doctor, admin
@@ -7,23 +8,27 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const navigate = useNavigate();
   const handleRoleChange = (newRole) => {
     setRole(newRole);
   };
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    setLoading(true);
+if (res.ok) {
+  alert("Login successful");
+  console.log(data);
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log(`Login attempt - Role: ${role}, Email: ${email}`);
-      alert(`Login successful as ${role}! (Backend integration needed)`);
-      setLoading(false);
-      // Redirect logic will go here later
-    }, 1500);
-  };
+  // Store user (optional but recommended)
+  localStorage.setItem("user", JSON.stringify(data));
+
+  // 🔥 Role-based redirect
+  if (role === "patient") {
+    navigate("/dashboard");
+  } else if (role === "doctor") {
+    navigate("/doctor");
+  } else if (role === "admin") {
+    navigate("/admin");
+  }
+}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-700 via-cyan-800 to-sky-900 flex items-center justify-center p-6">

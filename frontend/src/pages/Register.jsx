@@ -23,16 +23,38 @@ const Register = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleRegister = (e) => {
-    e.preventDefault();
-    setLoading(true);
+const handleRegister = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-    setTimeout(() => {
-      console.log(`${role === 'patient' ? 'Patient' : 'Doctor'} Registration:`, formData);
+  try {
+    const res = await fetch("http://localhost:5000/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        role
+      }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
       setSuccess(true);
-      setLoading(false);
-    }, 1500);
-  };
+    } else {
+      alert(data.message);
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Server error");
+  }
+
+  setLoading(false);
+};
 
   const resetForm = () => {
     setFormData({
