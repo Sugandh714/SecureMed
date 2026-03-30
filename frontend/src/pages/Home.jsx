@@ -308,7 +308,7 @@ const HomePage = () => {
                     <li className="flex gap-3 items-center"><span className="text-emerald-400">✓</span> View only PRE-decrypted files</li>
                     <li className="flex gap-3 items-center"><span className="text-emerald-400">✓</span> See expiration timers</li>
                   </ul>
-                  <button className="mt-10 text-sm font-medium text-blue-600 group-hover:underline">Preview Doctor Dashboard →</button>
+                  <button onClick={() => navigate("/doctor")} className="mt-10 text-sm font-medium text-blue-600 group-hover:underline">Preview Doctor Dashboard →</button>
                 </div>
               </div>
 
