@@ -21,7 +21,7 @@ export default function Sidebar() {
         <div className="w-9 h-9 bg-emerald-500 rounded-2xl flex items-center justify-center text-white">
           <span className="text-xl">🛡️</span>
         </div>
-        <div className="text-3xl font-semibold tracking-tighter text-slate-900 dark:text-white">MedVault</div>
+        <div className="text-3xl font-semibold tracking-tighter text-slate-900 dark:text-white">SecureMed</div>
       </div>
 
       {/* Navigation */}

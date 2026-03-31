@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"
 
 // ═══════════════════════════════════════════════════════════════
 // MOCK DATA
@@ -286,155 +286,331 @@ const TabPatients = () => {
   );
 };
 
+
+
+
+
 const TabDoctors = () => {
   const [rows, setRows] = useState(INIT_DOCTORS);
   const [apps, setApps] = useState(INIT_APPLICATIONS);
-  const [sub, setSub]   = useState("active");
+  const [sub, setSub] = useState("active");
   const [view, setView] = useState(null);
   const [appA, setAppA] = useState(null);
   const [appR, setAppR] = useState(null);
   const [rNote, setRNote] = useState("");
-  const EMPTY = { name:"", spec:"", dept:"", email:"", phone:"", license:"", experience:"", status:"Active" };
-  const [f, setF] = useState(EMPTY);
+  const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
-  const toggleDoc = id => setRows(r => r.map(d => d.id === id ? { ...d, status: d.status === "Active" ? "Suspended" : "Active" } : d));
-  const handleReg = () => {
-    if (!f.name || !f.spec || !f.dept || !f.email || !f.license) { setErr("Please fill all required fields."); return; }
-    setRows(r => [...r, { ...f, id:`D-${200+r.length}`, patients:0 }]);
-    setF(EMPTY); setErr(""); setSub("active");
+  const EMPTY_APP = {
+    name: "", spec: "", dept: "", email: "", phone: "", license: "", experience: "", hospital: ""
   };
-  const handleApprove = app => {
-    setRows(r => [...r, { id:`D-${200+r.length}`, name:app.name, spec:app.spec, dept:app.dept, email:app.email, phone:app.phone, license:app.license, patients:0, status:"Active" }]);
-    setApps(a => a.map(x => x.id === app.id ? { ...x, status:"Approved" } : x));
-    setAppA(null);
+
+  const [f, setF] = useState(EMPTY_APP);
+
+  // Fetch pending applications
+const fetchApplications = async () => {
+  try {
+    setLoading(true);
+    const res = await fetch("http://localhost:5000/api/auth/applications/pending");
+    const data = await res.json();
+    
+    if (res.ok) {
+      const formattedApps = (data.applications || []).map(app => ({
+        ...app,
+        id: app._id || app.id,                    // Ensure id exists
+        spec: app.specialization || app.spec,     // Normalize field names
+        dept: app.department || app.dept
+      }));
+      setApps(formattedApps);
+    } else {
+      console.error("API Error:", data);
+    }
+  } catch (error) {
+    console.error("Failed to fetch applications:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  useEffect(() => {
+    if (sub === "approve") {
+      fetchApplications();
+    }
+  }, [sub]);
+
+  // Approve Doctor
+const handleApprove = async (app) => {
+  if (!app) {
+    alert("No application selected");
+    return;
+  }
+
+  const appId = app.id || app._id;   // Support both id and _id
+  console.log("Approving app:", app);
+console.log("Using ID:", appId);
+  if (!appId) {
+    alert("Application ID is missing. Please refresh the page.");
+    console.error("App object:", app);
+    return;
+  }
+
+  try {
+    const res = await fetch(`http://localhost:5000/api/auth/applications/${appId}/approve`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ approvedBy: "Admin Singh" })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert(`✅ ${app.name} has been approved successfully!`);
+
+      // Add to active doctors
+      const newDoctor = {
+        id: `D-${Date.now().toString().slice(-4)}`,
+        name: app.name,
+        spec: app.specialization || app.spec || "General Medicine",
+        dept: app.department || app.dept || "General",
+        email: app.email,
+        phone: app.phone || "",
+        license: app.medicalId || app.license || "",
+        patients: 0,
+        status: "Active"
+      };
+
+      setRows(prev => [...prev, newDoctor]);
+      setApps(prev => prev.filter(a => (a.id || a._id) !== appId));
+      setAppA(null);
+    } else {
+      alert(data.message || "Failed to approve doctor");
+    }
+  } catch (error) {
+    console.error("Approve error:", error);
+    alert("Server error while approving. Check console for details.");
+  }
+};
+
+  // Reject Doctor
+  const handleReject = async (app) => {
+    if (!app || !app.id) return;
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/auth/applications/${app.id}/reject`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          reason: rNote || "Not approved by admin",
+          rejectedBy: "Admin Singh" 
+        })
+      });
+
+      if (res.ok) {
+        alert(`Application from ${app.name} has been rejected`);
+        setApps(prev => prev.filter(a => a.id !== app.id));
+        setAppR(null);
+        setRNote("");
+      } else {
+        alert("Failed to reject application");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Server error while rejecting");
+    }
   };
-  const handleReject = app => { setApps(a => a.map(x => x.id === app.id ? { ...x, status:"Denied" } : x)); setAppR(null); setRNote(""); };
-  const pending = apps.filter(a => a.status === "Pending").length;
+
+  const pendingCount = apps.filter(a => a.status === "Pending").length;
 
   return (
     <div>
-      <PageHeader title="Doctor Management" sub={`${rows.length} doctors · ${pending} pending applications`} />
-      <TabBar active={sub} onChange={setSub} tabs={[
-        { id:"active",   icon:"🩺", label:"Active Doctors" },
-        { id:"register", icon:"➕", label:"Register Doctor" },
-        { id:"approve",  icon:"📋", label:"Approve Applications", badge:pending },
-      ]} />
+      <PageHeader 
+        title="Doctor Management" 
+        sub={`${rows.length} active doctors · ${pendingCount} pending applications`} 
+      />
 
-      {/* ── Active Doctors ── */}
-      {sub === "active" && <TCard>
-        <table className="w-full">
-          <TH cols={["Doctor ID","Name & Email","Specialization","Dept","Patients","Status","Actions"]} />
-          <tbody>{rows.map((d, i) => (
-            <TR key={d.id} i={i}>
-              <TD mono>{d.id}</TD>
-              <TD><div className="font-semibold text-slate-800">{d.name}</div><div className="text-[11px] text-slate-400">{d.email}</div></TD>
-              <TD><span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full ring-1 bg-blue-50 text-blue-700 ring-blue-100">{d.spec}</span></TD>
-              <TD>{d.dept}</TD>
-              <TD><span className="font-semibold text-slate-800">{d.patients}</span><span className="text-slate-400 text-xs ml-1">pts</span></TD>
-              <TD><Pill v={d.status} /></TD>
-              <td className="px-4 py-3"><div className="flex items-center gap-1">
-                <IBtn title="View Profile" onClick={() => setView(d)}>👁</IBtn>
-                <IBtn title="Edit">✏️</IBtn>
-                <IBtn title="Permissions">📜</IBtn>
-                <IBtn title="Suspend / Activate" danger onClick={() => toggleDoc(d.id)}>🚫</IBtn>
-              </div></td>
-            </TR>
-          ))}</tbody>
-        </table>
-      </TCard>}
+      <TabBar 
+        active={sub} 
+        onChange={setSub} 
+        tabs={[
+          { id:"active",   icon:"🩺", label:"Active Doctors" },
+          { id:"register", icon:"➕", label:"New Doctor Application" },
+          { id:"approve",  icon:"📋", label:"Approve Applications", badge: pendingCount },
+        ]} 
+      />
 
-      {/* ── Register Form ── */}
-      {sub === "register" && <div className="bg-white rounded-2xl ring-1 ring-slate-100 shadow-sm p-6 max-w-2xl">
-        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-50">
-          <div className="w-9 h-9 rounded-xl bg-teal-50 ring-1 ring-teal-100 flex items-center justify-center text-lg">🩺</div>
-          <div><h3 className="font-bold text-slate-800 text-sm">Register New Doctor</h3><p className="text-[11px] text-slate-400">Directly onboard a doctor to the system</p></div>
-        </div>
-        {err && <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-medium">{err}</div>}
-        <div className="space-y-4">
-          <div><Lbl req>Full Name</Lbl><Inp placeholder="Dr. Full Name" value={f.name} onChange={e => setF({ ...f, name:e.target.value })} /></div>
-          <div className="grid grid-cols-2 gap-4">
-            <div><Lbl req>Specialization</Lbl><Sel value={f.spec} onChange={e => setF({ ...f, spec:e.target.value })}><option value="">Select…</option>{SPECS.map(s => <option key={s}>{s}</option>)}</Sel></div>
-            <div><Lbl req>Department</Lbl><Sel value={f.dept} onChange={e => setF({ ...f, dept:e.target.value })}><option value="">Select…</option>{DEPTS.map(d => <option key={d}>{d}</option>)}</Sel></div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div><Lbl req>Email</Lbl><Inp type="email" placeholder="doctor@hospital.in" value={f.email} onChange={e => setF({ ...f, email:e.target.value })} /></div>
-            <div><Lbl>Phone</Lbl><Inp type="tel" placeholder="10-digit mobile" value={f.phone} onChange={e => setF({ ...f, phone:e.target.value })} /></div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div><Lbl req>MCI License No.</Lbl><Inp placeholder="e.g. MCI-4501" value={f.license} onChange={e => setF({ ...f, license:e.target.value })} /></div>
-            <div><Lbl>Years of Experience</Lbl><Inp placeholder="e.g. 8 years" value={f.experience} onChange={e => setF({ ...f, experience:e.target.value })} /></div>
-          </div>
-          <div><Lbl>Initial Status</Lbl><Sel value={f.status} onChange={e => setF({ ...f, status:e.target.value })}><option>Active</option><option>On Leave</option></Sel></div>
-        </div>
-        <div className="flex gap-3 mt-6 pt-5 border-t border-slate-50">
-          <button onClick={() => { setF(EMPTY); setErr(""); }} className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-500 text-sm font-semibold hover:bg-slate-50 transition-colors">Clear</button>
-          <button onClick={handleReg} className="flex-1 py-2.5 rounded-xl bg-teal-600 text-white text-sm font-bold hover:bg-teal-700 transition-colors shadow-sm">✅ Register Doctor</button>
-        </div>
-      </div>}
+      {/* Active Doctors */}
+      {sub === "active" && (
+        <TCard>
+          <table className="w-full">
+            <TH cols={["Doctor ID","Name & Email","Specialization","Dept","Patients","Status","Actions"]} />
+            <tbody>
+              {rows.map((d, i) => (
+                <TR key={d.id} i={i}>   {/* ← Fixed: added key */}
+                  <TD mono>{d.id}</TD>
+                  <TD>
+                    <div className="font-semibold text-slate-800">{d.name}</div>
+                    <div className="text-[11px] text-slate-400">{d.email}</div>
+                  </TD>
+                  <TD>
+                    <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full ring-1 bg-blue-50 text-blue-700 ring-blue-100">
+                      {d.spec}
+                    </span>
+                  </TD>
+                  <TD>{d.dept}</TD>
+                  <TD>
+                    <span className="font-semibold text-slate-800">{d.patients}</span>
+                    <span className="text-slate-400 text-xs ml-1">pts</span>
+                  </TD>
+                  <TD><Pill v={d.status} /></TD>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1">
+                      <IBtn title="View" onClick={() => setView(d)}>👁</IBtn>
+                      <IBtn title="Suspend" danger>🚫</IBtn>
+                    </div>
+                  </td>
+                </TR>
+              ))}
+            </tbody>
+          </table>
+        </TCard>
+      )}
 
-      {/* ── Approve Applications ── */}
-      {sub === "approve" && <div className="space-y-4">
-        <div className="grid grid-cols-3 gap-3">
-          {[{ label:"Pending", color:"text-amber-600", bg:"bg-amber-50", ring:"ring-amber-100", val:apps.filter(a=>a.status==="Pending").length },
-            { label:"Approved", color:"text-emerald-600", bg:"bg-emerald-50", ring:"ring-emerald-100", val:apps.filter(a=>a.status==="Approved").length },
-            { label:"Rejected", color:"text-rose-600", bg:"bg-rose-50", ring:"ring-rose-100", val:apps.filter(a=>a.status==="Denied").length }
-          ].map(({ label, color, bg, ring, val }) => (
-            <div key={label} className={`${bg} ring-1 ${ring} rounded-2xl p-4 text-center`}><p className={`text-2xl font-bold ${color}`}>{val}</p><p className="text-xs text-slate-500 mt-0.5">{label}</p></div>
-          ))}
-        </div>
-        {apps.map(a => (
-          <div key={a.id} className={`bg-white rounded-2xl ring-1 shadow-sm p-5 ${a.status==="Pending"?"ring-amber-200":a.status==="Approved"?"ring-emerald-200":"ring-slate-100"}`}>
-            <div className="flex items-start gap-4">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                {a.name.split(" ").slice(-1)[0][0]}
+      {/* Register New Doctor Form */}
+      {sub === "register" && (
+        <div className="bg-white rounded-2xl ring-1 ring-slate-100 shadow-sm p-6 max-w-2xl">
+          {err && <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700">{err}</div>}
+
+          <div className="space-y-4">
+            <div><Lbl req>Full Name</Lbl>
+              <Inp placeholder="Dr. Full Name" value={f.name} onChange={e => setF({ ...f, name: e.target.value })} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div><Lbl req>Specialization</Lbl>
+                <Sel value={f.spec} onChange={e => setF({ ...f, spec: e.target.value })}>
+                  <option value="">Select Specialization</option>
+                  {SPECS.map(s => <option key={s} value={s}>{s}</option>)}
+                </Sel>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap mb-2"><span className="font-bold text-slate-800">{a.name}</span><Pill v={a.status} /></div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-2">
-                  {[["Specialization",a.spec],["Department",a.dept],["License",a.license],["Experience",a.experience],["Email",a.email],["Phone",a.phone],["Applied",a.submitted],["App ID",a.id]].map(([k, v]) => (
-                    <div key={k}><p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{k}</p><p className="text-xs text-slate-700 font-medium">{v}</p></div>
-                  ))}
-                </div>
+              <div><Lbl req>Department</Lbl>
+                <Sel value={f.dept} onChange={e => setF({ ...f, dept: e.target.value })}>
+                  <option value="">Select Department</option>
+                  {DEPTS.map(d => <option key={d} value={d}>{d}</option>)}
+                </Sel>
               </div>
-              {a.status === "Pending" && (
-                <div className="flex flex-col gap-2 flex-shrink-0">
-                  <button onClick={() => setAppA(a)} className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shadow-sm">✅ Approve</button>
-                  <button onClick={() => setAppR(a)} className="bg-white hover:bg-rose-50 text-rose-600 ring-1 ring-rose-200 text-xs font-bold px-4 py-2 rounded-xl transition-colors">❌ Reject</button>
-                </div>
-              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div><Lbl req>Email</Lbl>
+                <Inp type="email" value={f.email} onChange={e => setF({ ...f, email: e.target.value })} />
+              </div>
+              <div><Lbl>Phone</Lbl>
+                <Inp type="tel" value={f.phone} onChange={e => setF({ ...f, phone: e.target.value })} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div><Lbl req>MCI License</Lbl>
+                <Inp value={f.license} onChange={e => setF({ ...f, license: e.target.value })} placeholder="MCI-XXXX" />
+              </div>
+              <div><Lbl>Experience</Lbl>
+                <Inp value={f.experience} onChange={e => setF({ ...f, experience: e.target.value })} />
+              </div>
+            </div>
+
+            <div><Lbl>Hospital</Lbl>
+              <Inp value={f.hospital} onChange={e => setF({ ...f, hospital: e.target.value })} />
             </div>
           </div>
-        ))}
-      </div>}
 
-      {view && <Modal title={`Doctor — ${view.name}`} onClose={() => setView(null)}>
-        <div className="space-y-3 text-sm">
-          {[["ID",view.id],["Specialization",view.spec],["Department",view.dept],["Email",view.email],["Phone",view.phone],["License",view.license],["Patients",view.patients]].map(([k,v]) => (
-            <div key={k} className="flex justify-between gap-4"><span className="text-slate-400">{k}</span><span className="font-medium text-slate-800 text-right">{v}</span></div>
+          <div className="flex gap-3 mt-8">
+            <button onClick={() => { setF(EMPTY_APP); setErr(""); }} className="px-6 py-3 border rounded-xl text-slate-500 hover:bg-slate-50">
+              Clear
+            </button>
+            <button 
+              onClick={handleSubmitApplication}
+              disabled={loading}
+              className="flex-1 py-3 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 disabled:opacity-70"
+            >
+              {loading ? "Submitting..." : "Submit Application"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Approve Tab */}
+      {sub === "approve" && (
+        <div className="space-y-4">
+          {loading && <p className="text-center py-8 text-slate-500">Loading pending applications...</p>}
+
+          {apps.length === 0 && !loading && (
+            <div className="text-center py-12 bg-white rounded-2xl ring-1 ring-slate-100">
+              No pending doctor applications.
+            </div>
+          )}
+
+          {apps.map((a) => (
+            <div key={a.id || a._id} className="bg-white rounded-2xl p-6 ring-1 shadow-sm">   {/* ← Fixed key */}
+              <div className="flex items-start gap-4">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 text-white font-bold flex items-center justify-center">
+                  {a.name?.[0]}
+                </div>
+                <div className="flex-1">
+                  <div className="font-bold text-lg">{a.name}</div>
+                  <div className="text-sm text-slate-600">{a.email}</div>
+                  <div className="grid grid-cols-2 gap-4 mt-3 text-sm">
+                    <div><span className="text-slate-400">Specialization:</span> {a.specialization || a.spec}</div>
+                    <div><span className="text-slate-400">Department:</span> {a.department || a.dept}</div>
+                    <div><span className="text-slate-400">License:</span> {a.medicalId || a.license}</div>
+                  </div>
+                </div>
+
+                {a.status === "Pending" && (
+                  <div className="flex flex-col gap-2">
+                    <button onClick={() => setAppA(a)} className="bg-emerald-600 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-700">
+                      Approve
+                    </button>
+                    <button onClick={() => setAppR(a)} className="bg-rose-50 text-rose-600 px-5 py-2 rounded-xl text-sm font-semibold ring-1 ring-rose-200 hover:bg-rose-100">
+                      Reject
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           ))}
-          <div className="flex justify-between"><span className="text-slate-400">Status</span><Pill v={view.status} /></div>
         </div>
-        <button onClick={() => setView(null)} className="mt-5 w-full py-2.5 rounded-xl bg-slate-100 text-slate-600 text-sm font-semibold hover:bg-slate-200 transition-colors">Close</button>
-      </Modal>}
-      {appA && <Modal title="Confirm Approval" onClose={() => setAppA(null)}>
-        <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-700 mb-4">Approving <strong>{appA.name}</strong> will add them as an Active doctor.</div>
-        <div className="space-y-2 text-sm mb-5">
-          {[["Specialization",appA.spec],["License",appA.license],["Department",appA.dept]].map(([k,v]) => <div key={k} className="flex justify-between"><span className="text-slate-400">{k}</span><span className="font-medium">{v}</span></div>)}
-        </div>
-        <div className="flex gap-2">
-          <button onClick={() => setAppA(null)} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-500 text-sm font-semibold hover:bg-slate-50 transition-colors">Cancel</button>
-          <button onClick={() => handleApprove(appA)} className="flex-1 py-2.5 rounded-xl bg-emerald-500 text-white text-sm font-bold hover:bg-emerald-600 transition-colors shadow-sm">Confirm Approval</button>
-        </div>
-      </Modal>}
-      {appR && <Modal title="Reject Application" onClose={() => setAppR(null)}>
-        <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 mb-4">Rejecting <strong>{appR.name}</strong>'s application. This action is logged.</div>
-        <div className="mb-4"><Lbl>Reason for Rejection</Lbl><textarea rows={3} value={rNote} onChange={e => setRNote(e.target.value)} placeholder="Provide a reason (recommended)…" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-rose-300 placeholder:text-slate-300" /></div>
-        <div className="flex gap-2">
-          <button onClick={() => setAppR(null)} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-500 text-sm font-semibold hover:bg-slate-50 transition-colors">Cancel</button>
-          <button onClick={() => handleReject(appR)} className="flex-1 py-2.5 rounded-xl bg-rose-600 text-white text-sm font-bold hover:bg-rose-700 transition-colors shadow-sm">Confirm Rejection</button>
-        </div>
-      </Modal>}
+      )}
+
+      {/* Modals */}
+      {appA && (
+        <Modal title="Approve Doctor" onClose={() => setAppA(null)}>
+          <p className="mb-6">Are you sure you want to approve <strong>{appA.name}</strong>?</p>
+          <div className="flex gap-3">
+            <button onClick={() => setAppA(null)} className="flex-1 py-3 border rounded-xl">Cancel</button>
+            <button onClick={() => handleApprove(appA)} className="flex-1 py-3 bg-emerald-600 text-white rounded-xl font-semibold">
+              Confirm Approval
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {appR && (
+        <Modal title="Reject Application" onClose={() => { setAppR(null); setRNote(""); }}>
+          <p className="mb-4">Reject application from <strong>{appR.name}</strong>?</p>
+          <textarea
+            value={rNote}
+            onChange={(e) => setRNote(e.target.value)}
+            placeholder="Reason for rejection (optional)"
+            className="w-full h-24 border rounded-2xl p-4 text-sm mb-4"
+          />
+          <div className="flex gap-3">
+            <button onClick={() => { setAppR(null); setRNote(""); }} className="flex-1 py-3 border rounded-xl">Cancel</button>
+            <button onClick={() => handleReject(appR)} className="flex-1 py-3 bg-rose-600 text-white rounded-xl font-semibold">
+              Confirm Rejection
+            </button>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

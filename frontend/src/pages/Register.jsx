@@ -28,17 +28,27 @@ const handleRegister = async (e) => {
   setLoading(true);
 
   try {
+    const payload = {
+      name: formData.fullName,
+      email: formData.email,
+      password: formData.password,
+      role
+    };
+
+    // Add doctor-specific fields only if registering as doctor
+    if (role === 'doctor') {
+      payload.medicalId = formData.medicalId;
+      payload.specialization = formData.specialization;
+      payload.department = formData.department;
+      payload.phone = formData.phone || "";
+      payload.experience = formData.experience || "";
+      payload.hospital = formData.hospital || "City General Hospital";
+    }
+
     const res = await fetch("http://localhost:5000/api/auth/register", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: formData.fullName,
-        email: formData.email,
-        password: formData.password,
-        role
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     });
 
     const data = await res.json();
@@ -46,11 +56,11 @@ const handleRegister = async (e) => {
     if (res.ok) {
       setSuccess(true);
     } else {
-      alert(data.message);
+      alert(data.message || "Registration failed");
     }
   } catch (err) {
     console.error(err);
-    alert("Server error");
+    alert("Server error. Please check console.");
   }
 
   setLoading(false);

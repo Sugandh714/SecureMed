@@ -4,10 +4,11 @@ import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [role, setRole] = useState('patient');
-  const [email, setEmail] = useState('');
+  const [loginIdentifier, setLoginIdentifier] = useState('');  // Email OR Username
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const navigate = useNavigate();
 
@@ -15,49 +16,50 @@ const Login = () => {
     setRole(newRole);
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+const handleLogin = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError("");
 
-    try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password, role }),
-      });
+ 
 
-      const data = await res.json();
+  try {
+    const res = await fetch("http://localhost:5000/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+  loginIdentifier: loginIdentifier.trim(), // ✅ trim whitespace
+  password: password,
+  role: role,
+}),
+    });
 
-      if (res.ok) {
-        alert("Login successful");
+    const data = await res.json();
+    
 
-        // store user
-        localStorage.setItem("user", JSON.stringify(data));
+    if (res.ok) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-        // 🔥 role-based redirect (use backend role if available)
-        const userRole = data.role || role;
+      alert("Login successful!");
 
-        if (userRole === "patient") {
-          navigate("/dashboard");
-        } else if (userRole === "doctor") {
-          navigate("/doctor");
-        } else if (userRole === "admin") {
-          navigate("/admin");
-        }
-
+      if (data.user.role === "admin") {
+        navigate("/admin");
+      } else if (data.user.role === "doctor") {
+        navigate("/doctor");
       } else {
-        alert(data.message || "Login failed");
+        navigate("/dashboard");
       }
-
-    } catch (err) {
-      console.error(err);
-      alert("Server error");
+    } else {
+      setError(data.message || "Login failed");
     }
-
+  } catch (err) {
+    console.error(err);
+    setError("Server error. Please try again.");
+  } finally {
     setLoading(false);
-  };
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-700 via-cyan-800 to-sky-900 flex items-center justify-center p-6">
@@ -83,7 +85,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => handleRoleChange('patient')}
-                className={`flex-1 py-3 rounded-xl flex items-center justify-center gap-2 ${
+                className={`flex-1 py-3 rounded-xl flex items-center justify-center gap-2 transition-all ${
                   role === 'patient' ? 'bg-white shadow text-teal-700' : 'text-gray-600'
                 }`}
               >
@@ -93,7 +95,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => handleRoleChange('doctor')}
-                className={`flex-1 py-3 rounded-xl flex items-center justify-center gap-2 ${
+                className={`flex-1 py-3 rounded-xl flex items-center justify-center gap-2 transition-all ${
                   role === 'doctor' ? 'bg-white shadow text-teal-700' : 'text-gray-600'
                 }`}
               >
@@ -103,7 +105,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => handleRoleChange('admin')}
-                className={`flex-1 py-3 rounded-xl flex items-center justify-center gap-2 ${
+                className={`flex-1 py-3 rounded-xl flex items-center justify-center gap-2 transition-all ${
                   role === 'admin' ? 'bg-white shadow text-teal-700' : 'text-gray-600'
                 }`}
               >
@@ -111,17 +113,26 @@ const Login = () => {
               </button>
             </div>
 
+            {/* Error Message */}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-2xl text-sm">
+                {error}
+              </div>
+            )}
+
             {/* Form */}
             <form onSubmit={handleLogin} className="space-y-6">
 
-              <input
-                type="text"
-                placeholder="Email or Username"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-5 py-4 border rounded-2xl"
-              />
+              <div>
+                <input
+  type="text"
+  placeholder="Email or Full Name"
+  value={loginIdentifier}
+  onChange={(e) => setLoginIdentifier(e.target.value)}
+  required
+  className="w-full px-5 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+/>
+              </div>
 
               <div className="relative">
                 <input
@@ -130,13 +141,13 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full px-5 py-4 border rounded-2xl pr-12"
+                  className="w-full px-5 py-4 border border-gray-300 rounded-2xl pr-12 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                 />
 
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -145,7 +156,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-teal-600 text-white py-4 rounded-2xl"
+                className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-4 rounded-2xl transition-all disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {loading ? "Signing in..." : "Sign In"}
               </button>
@@ -155,9 +166,9 @@ const Login = () => {
 
           {/* Footer */}
           <div className="border-t px-8 py-6 text-center">
-            <p>
+            <p className="text-gray-600">
               Don’t have an account?{" "}
-              <a href="/register" className="text-teal-600 font-semibold">
+              <a href="/register" className="text-teal-600 font-semibold hover:underline">
                 Create Account
               </a>
             </p>
