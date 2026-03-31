@@ -1063,7 +1063,7 @@ export default function HealthcareAdminDashboard() {
       <aside className="w-60 bg-white border-r border-slate-100 flex flex-col shadow-sm flex-shrink-0">
         <div className="h-16 flex items-center gap-3 px-5 border-b border-slate-100">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center text-white text-sm font-bold shadow-sm">H</div>
-          <div><p className="text-sm font-bold text-slate-800 leading-none">HealthAdmin</p><p className="text-[10px] text-slate-400 mt-0.5">Management Portal</p></div>
+          <div><p className="text-sm font-bold text-slate-800 leading-none">SecureMed</p><p className="text-[10px] text-slate-400 mt-0.5">Management Portal</p></div>
         </div>
         <nav className="flex-1 py-4 px-3 space-y-0.5">
           <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest px-3 mb-3">Navigation</p>
