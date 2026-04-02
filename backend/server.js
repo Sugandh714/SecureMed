@@ -1,22 +1,44 @@
+// backend/server.js
+import dotenv from "dotenv";
+dotenv.config();
+
+
 import express from "express";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
+
 import cors from "cors";
 
-import { register, login } from "./controllers/authController.js";
+// ================= IMPORT ALL CONTROLLERS =================
+import {
+  register,
+  login,
+  getPendingApplications,
+  approveDoctor,
+  rejectDoctor
+} from "./controllers/authController.js";
 
-dotenv.config();
+import profileRoutes from "./routes/profileRoutes.js";
+
+// NEW ROUTES (for Patient Features)
+import recordRoutes from "./routes/recordRoutes.js";
+import requestRoutes from "./routes/requestRoutes.js";
+//import logRoutes from "./routes/logRoutes.js";
+
+
 
 const app = express();
 
 /* ================= MIDDLEWARE ================= */
 app.use(cors({
-  origin: "http://localhost:5173", // your Vite frontend
+  origin: "http://localhost:5173",
   credentials: true
 }));
 app.use(express.json());
+console.log("ENV CHECK:");
+console.log("PINATA_API_KEY:", process.env.PINATA_API_KEY);
+console.log("PINATA_SECRET:", process.env.PINATA_SECRET_API_KEY);
 
-/* ================= DB ================= */
+/* ================= DATABASE ================= */
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected ✅"))
   .catch(err => {
@@ -26,31 +48,35 @@ mongoose.connect(process.env.MONGO_URI)
 
 /* ================= ROUTES ================= */
 
-// Auth Routes
-app.post("/api/auth/register", async (req, res) => {
-  try {
-    await register(req, res);
-  } catch (err) {
-    res.status(500).json({ message: "Register error", error: err.message });
-  }
-});
+// === Auth Routes (Original) ===
+app.post("/api/auth/register", register);
+app.post("/api/auth/login", login);
 
-app.post("/api/auth/login", async (req, res) => {
-  try {
-    await login(req, res);
-  } catch (err) {
-    res.status(500).json({ message: "Login error", error: err.message });
-  }
-});
+// === Doctor Application Routes (Admin Only - Original) ===
+app.get("/api/auth/applications/pending", getPendingApplications);
+app.post("/api/auth/applications/:id/approve", approveDoctor);
+app.post("/api/auth/applications/:id/reject", rejectDoctor);
 
-/* ================= TEST ================= */
+// === Profile Route ===
+app.use('/api/profile', profileRoutes);
+
+// === Patient Medical Records Routes ===
+app.use("/api/records", recordRoutes);
+
+// === Access Requests Routes ===
+app.use("/api/requests", requestRoutes);
+
+// === Blockchain Logs Routes ===
+//app.use("/api/logs", logRoutes);
+
+/* ================= TEST ROUTE ================= */
 app.get("/", (req, res) => {
-  res.send("API running...");
+  res.send("SecureMed API is running...");
 });
 
-/* ================= SERVER ================= */
+/* ================= START SERVER ================= */
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on ${PORT}`);
+  console.log(`🚀 SecureMed Server running on port ${PORT}`);
 });
