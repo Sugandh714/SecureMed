@@ -1,9 +1,8 @@
-// controllers/authController.js
+// backend/controllers/authController.js
 import User from "../models/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
-// Import DoctorApplication model using ES Module syntax
+// Import DoctorApplication model
 import DoctorApplication from "../models/DoctorApplication.js";
 
 /* ================= REGISTER ================= */
@@ -15,8 +14,9 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "Name, email, password and role are required" });
     }
 
-    // Check if email already exists
+    // Check if email already exists as user
     const existingUser = await User.findOne({ email });
+    // Check if there's already a pending doctor application
     const existingApp = await DoctorApplication.findOne({ email, status: 'Pending' });
 
     if (existingUser) {
@@ -34,20 +34,28 @@ export const register = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        role: 'patient'
+        role: 'patient',
+        // Optional fields for patient
+        medicalId: medicalId || null,
+        phone: phone || null,
+        department: department || null
       });
-
       await newUser.save();
 
       return res.status(201).json({
         message: "Patient account created successfully",
-        user: { id: newUser._id, name, email, role: 'patient' }
+        user: { 
+          id: newUser._id, 
+          name, 
+          email, 
+          role: 'patient' 
+        }
       });
     } 
     else if (role === 'doctor') {
       if (!medicalId || !specialization || !department) {
-        return res.status(400).json({ 
-          message: "Medical ID, specialization and department are required for doctor registration" 
+        return res.status(400).json({
+          message: "Medical ID, specialization and department are required for doctor registration"
         });
       }
 
@@ -58,8 +66,8 @@ export const register = async (req, res) => {
         medicalId,
         specialization,
         department,
-        phone,
-        experience,
+        phone: phone || null,
+        experience: experience || null,
         hospital: hospital || "City General Hospital",
         status: 'Pending'
       });
@@ -74,7 +82,6 @@ export const register = async (req, res) => {
     else {
       return res.status(400).json({ message: "Invalid role. Only 'patient' or 'doctor' allowed." });
     }
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Registration failed", error: err.message });
@@ -88,10 +95,10 @@ export const getPendingApplications = async (req, res) => {
       .select('-password')
       .sort({ submittedAt: -1 });
 
-    res.json({ 
+    res.json({
       success: true,
       count: applications.length,
-      applications 
+      applications
     });
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch applications", error: err.message });
@@ -128,7 +135,7 @@ export const approveDoctor = async (req, res) => {
 
     await newDoctor.save();
 
-    // Update application
+    // Update application status
     application.status = 'Approved';
     application.approvedBy = approvedBy || 'Admin Singh';
     application.approvedAt = new Date();
@@ -138,7 +145,6 @@ export const approveDoctor = async (req, res) => {
       message: `Doctor ${application.name} approved successfully`,
       doctorId: newDoctor._id
     });
-
   } catch (err) {
     res.status(500).json({ message: "Approval failed", error: err.message });
   }
@@ -167,31 +173,22 @@ export const rejectDoctor = async (req, res) => {
       message: `Application from ${application.name} has been rejected`,
       reason: application.rejectionReason
     });
-
   } catch (err) {
     res.status(500).json({ message: "Rejection failed", error: err.message });
   }
 };
-/* ================= LOGIN - Support Email OR Name ================= */
+
+/* ================= LOGIN - Enhanced Version (Supports Email or Name) ================= */
 export const login = async (req, res) => {
   try {
-    // console.log("Received login body:", req.body);
-
     const { loginIdentifier, email, password, role } = req.body;
     const identifier = (loginIdentifier || email || "").trim();
 
-    // console.log("Identifier:", identifier);   // ✅ Add this
-    // console.log("Role:", role);               // ✅ Add this
-
     if (!identifier || !password || !role) {
-      return res.status(400).json({ message: "Email or Name, password and role are required" });
+      return res.status(400).json({ message: "Email/Name, password and role are required" });
     }
 
     const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-    // ✅ Add this — check what's actually in your DB
-    const allUsers = await User.find({}, { name: 1, email: 1, role: 1 });
-    // console.log("All users in DB:", allUsers);
 
     const user = await User.findOne({
       $or: [
@@ -199,8 +196,6 @@ export const login = async (req, res) => {
         { name: { $regex: new RegExp(`^${escapeRegex(identifier)}$`, "i") } },
       ],
     });
-
-    // console.log("Found user:", user);   // ✅ Add this
 
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
