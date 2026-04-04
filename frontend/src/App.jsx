@@ -13,6 +13,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 
 // Patient Pages
+import DashboardOutline from "./pages/Patient/DashboardLayout";
+import Sidebar from "./pages/Patient/Sidebar";
 import Overview from "./pages/Patient/Overview";
 import UploadRecords from "./pages/Patient/UploadRecords";
 import AccessRequests from "./pages/Patient/AccessRequests";
@@ -51,13 +53,20 @@ function App() {
 
           {/* Patient Dashboard - Proper Layout with Sidebar + Navbar */}
           // In App.jsx - Simple version (replace the dashboard part)
-          <Route path="/dashboard" element={<Overview />} />
+          {/* <Route path="/dashboard" element={<Overview />} />
           <Route path="/dashboard/upload" element={<UploadRecords />} />
           <Route path="/dashboard/requests" element={<AccessRequests />} />
           <Route path="/dashboard/records" element={<MyRecords />} />
           <Route path="/dashboard/logs" element={<BlockchainLogs />} />
-          <Route path="/dashboard/settings" element={<Settings />} />
-
+          <Route path="/dashboard/settings" element={<Settings />} /> */}
+          <Route path="/dashboard" element={<DashboardOutline />}>
+  <Route path="overview"  element={<Overview />} />
+  <Route path="records"   element={<MyRecords />} />
+  <Route path="upload"    element={<UploadRecords />} />
+  <Route path="requests"  element={<AccessRequests />} />
+  <Route path="logs"      element={<BlockchainLogs />} />
+  <Route path="settings"  element={<Settings />} />
+</Route>
           {/* Doctor Dashboard */}
           <Route path="/doctor" element={<DoctorDashboard />} />
 
