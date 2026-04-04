@@ -4,64 +4,64 @@ import { useState, useEffect } from "react"
 // MOCK DATA
 // ═══════════════════════════════════════════════════════════════
 const INIT_PATIENTS = [
-  { id:"P-0041", name:"Aanya Mehta",   age:34, gender:"F", doctor:"Dr. Arvind Rajan",  status:"Active",   consent:true  },
-  { id:"P-0042", name:"Rohan Verma",   age:58, gender:"M", doctor:"Dr. Sunita Nair",   status:"Active",   consent:false },
-  { id:"P-0043", name:"Priya Kapoor",  age:27, gender:"F", doctor:"Dr. Kiran Sharma",  status:"Inactive", consent:true  },
-  { id:"P-0044", name:"Vikram Singh",  age:45, gender:"M", doctor:"Dr. Arvind Rajan",  status:"Active",   consent:true  },
-  { id:"P-0045", name:"Meera Pillai",  age:61, gender:"F", doctor:"Dr. Sunita Nair",   status:"Active",   consent:true  },
+  { id: "P-0041", name: "Aanya Mehta", age: 34, gender: "F", doctor: "Dr. Arvind Rajan", status: "Active", consent: true },
+  { id: "P-0042", name: "Rohan Verma", age: 58, gender: "M", doctor: "Dr. Sunita Nair", status: "Active", consent: false },
+  { id: "P-0043", name: "Priya Kapoor", age: 27, gender: "F", doctor: "Dr. Kiran Sharma", status: "Inactive", consent: true },
+  { id: "P-0044", name: "Vikram Singh", age: 45, gender: "M", doctor: "Dr. Arvind Rajan", status: "Active", consent: true },
+  { id: "P-0045", name: "Meera Pillai", age: 61, gender: "F", doctor: "Dr. Sunita Nair", status: "Active", consent: true },
 ];
 const INIT_DOCTORS = [
-  { id:"D-101", name:"Dr. Arvind Rajan",  spec:"Cardiology",   dept:"Cardiology",    patients:14, status:"Active",   email:"rajan@hospital.in",  phone:"9876543210", license:"MCI-2891" },
-  { id:"D-102", name:"Dr. Sunita Nair",   spec:"Neurology",    dept:"Neurology",     patients:9,  status:"Active",   email:"nair@hospital.in",   phone:"9876543211", license:"MCI-3012" },
-  { id:"D-103", name:"Dr. Kiran Sharma",  spec:"Orthopaedics", dept:"Surgery",       patients:11, status:"On Leave", email:"sharma@hospital.in", phone:"9876543212", license:"MCI-2754" },
-  { id:"D-104", name:"Dr. Fatima Zaidi",  spec:"Oncology",     dept:"Oncology",      patients:7,  status:"Active",   email:"zaidi@hospital.in",  phone:"9876543213", license:"MCI-3198" },
+  { id: "D-101", name: "Dr. Arvind Rajan", spec: "Cardiology", dept: "Cardiology", patients: 14, status: "Active", email: "rajan@hospital.in", phone: "9876543210", license: "MCI-2891" },
+  { id: "D-102", name: "Dr. Sunita Nair", spec: "Neurology", dept: "Neurology", patients: 9, status: "Active", email: "nair@hospital.in", phone: "9876543211", license: "MCI-3012" },
+  { id: "D-103", name: "Dr. Kiran Sharma", spec: "Orthopaedics", dept: "Surgery", patients: 11, status: "On Leave", email: "sharma@hospital.in", phone: "9876543212", license: "MCI-2754" },
+  { id: "D-104", name: "Dr. Fatima Zaidi", spec: "Oncology", dept: "Oncology", patients: 7, status: "Active", email: "zaidi@hospital.in", phone: "9876543213", license: "MCI-3198" },
 ];
 const INIT_APPLICATIONS = [
-  { id:"APP-001", name:"Dr. Rohan Mehta",   spec:"Dermatology", dept:"Skin & Hair",   email:"r.mehta@gmail.com", phone:"9988776655", license:"MCI-4501", experience:"6 years", submitted:"2026-03-25", status:"Pending" },
-  { id:"APP-002", name:"Dr. Priya Iyer",    spec:"Gynaecology", dept:"Women Health",  email:"p.iyer@medcorp.in", phone:"9988776644", license:"MCI-4502", experience:"9 years", submitted:"2026-03-26", status:"Pending" },
-  { id:"APP-003", name:"Dr. Amit Kulkarni", spec:"Psychiatry",  dept:"Mental Health", email:"a.kulk@docmail.in", phone:"9988776633", license:"MCI-4503", experience:"4 years", submitted:"2026-03-27", status:"Pending" },
+  { id: "APP-001", name: "Dr. Rohan Mehta", spec: "Dermatology", dept: "Skin & Hair", email: "r.mehta@gmail.com", phone: "9988776655", license: "MCI-4501", experience: "6 years", submitted: "2026-03-25", status: "Pending" },
+  { id: "APP-002", name: "Dr. Priya Iyer", spec: "Gynaecology", dept: "Women Health", email: "p.iyer@medcorp.in", phone: "9988776644", license: "MCI-4502", experience: "9 years", submitted: "2026-03-26", status: "Pending" },
+  { id: "APP-003", name: "Dr. Amit Kulkarni", spec: "Psychiatry", dept: "Mental Health", email: "a.kulk@docmail.in", phone: "9988776633", license: "MCI-4503", experience: "4 years", submitted: "2026-03-27", status: "Pending" },
 ];
 const INIT_RECORDS = [
-  { id:"R-9001", patient:"Aanya Mehta",  type:"X-Ray",        by:"Dr. Rajan",  date:"2025-03-21", encrypted:true  },
-  { id:"R-9002", patient:"Rohan Verma",  type:"Prescription", by:"Dr. Nair",   date:"2025-03-22", encrypted:true  },
-  { id:"R-9003", patient:"Priya Kapoor", type:"Blood Report", by:"Dr. Sharma", date:"2025-03-23", encrypted:false },
-  { id:"R-9004", patient:"Vikram Singh", type:"MRI Scan",     by:"Dr. Rajan",  date:"2025-03-24", encrypted:true  },
+  { id: "R-9001", patient: "Aanya Mehta", type: "X-Ray", by: "Dr. Rajan", date: "2025-03-21", encrypted: true },
+  { id: "R-9002", patient: "Rohan Verma", type: "Prescription", by: "Dr. Nair", date: "2025-03-22", encrypted: true },
+  { id: "R-9003", patient: "Priya Kapoor", type: "Blood Report", by: "Dr. Sharma", date: "2025-03-23", encrypted: false },
+  { id: "R-9004", patient: "Vikram Singh", type: "MRI Scan", by: "Dr. Rajan", date: "2025-03-24", encrypted: true },
 ];
 const INIT_ACCESS = [
-  { id:"A-001", user:"Dr. Fatima Zaidi",  role:"Doctor",   record:"P-0042 Rohan Verma",  reason:"Second opinion on MRI",   type:"Normal",    status:"Pending"  },
-  { id:"A-002", user:"Nurse Rekha Patil", role:"Nurse",    record:"P-0041 Aanya Mehta",  reason:"Post-op monitoring",      type:"Emergency", status:"Pending"  },
-  { id:"A-003", user:"Dr. Kiran Sharma",  role:"Doctor",   record:"P-0044 Vikram Singh", reason:"Pre-surgical review",     type:"Normal",    status:"Approved" },
-  { id:"A-004", user:"External Lab",      role:"External", record:"P-0043 Priya Kapoor", reason:"Lab analysis request",    type:"Normal",    status:"Denied"   },
+  { id: "A-001", user: "Dr. Fatima Zaidi", role: "Doctor", record: "P-0042 Rohan Verma", reason: "Second opinion on MRI", type: "Normal", status: "Pending" },
+  { id: "A-002", user: "Nurse Rekha Patil", role: "Nurse", record: "P-0041 Aanya Mehta", reason: "Post-op monitoring", type: "Emergency", status: "Pending" },
+  { id: "A-003", user: "Dr. Kiran Sharma", role: "Doctor", record: "P-0044 Vikram Singh", reason: "Pre-surgical review", type: "Normal", status: "Approved" },
+  { id: "A-004", user: "External Lab", role: "External", record: "P-0043 Priya Kapoor", reason: "Lab analysis request", type: "Normal", status: "Denied" },
 ];
 const INIT_EMERGENCY = [
-  { id:"E-01", triggeredBy:"Dr. Fatima Zaidi", patient:"Vikram Singh (P-0044)", duration:"2h", time:"2026-03-28 23:10", active:true  },
-  { id:"E-02", triggeredBy:"Admin Override",    patient:"Meera Pillai (P-0045)", duration:"1h", time:"2026-03-27 03:45", active:false },
+  { id: "E-01", triggeredBy: "Dr. Fatima Zaidi", patient: "Vikram Singh (P-0044)", duration: "2h", time: "2026-03-28 23:10", active: true },
+  { id: "E-02", triggeredBy: "Admin Override", patient: "Meera Pillai (P-0045)", duration: "1h", time: "2026-03-27 03:45", active: false },
 ];
 const INIT_LOGS = [
-  { id:1, user:"Dr. Arvind Rajan",       action:"Viewed Record",     record:"R-9001", time:"2026-03-29 09:14", status:"Success" },
-  { id:2, user:"Unknown — 192.168.4.21", action:"Login Attempt",     record:"—",      time:"2026-03-29 09:31", status:"Denied"  },
-  { id:3, user:"Admin Singh",            action:"Deleted Record",    record:"R-9003", time:"2026-03-29 10:02", status:"Success" },
-  { id:4, user:"Nurse Rekha Patil",      action:"Viewed Record",     record:"R-9004", time:"2026-03-29 10:45", status:"Denied"  },
-  { id:5, user:"Dr. Sunita Nair",        action:"Downloaded Record", record:"R-9002", time:"2026-03-29 11:20", status:"Success" },
+  { id: 1, user: "Dr. Arvind Rajan", action: "Viewed Record", record: "R-9001", time: "2026-03-29 09:14", status: "Success" },
+  { id: 2, user: "Unknown — 192.168.4.21", action: "Login Attempt", record: "—", time: "2026-03-29 09:31", status: "Denied" },
+  { id: 3, user: "Admin Singh", action: "Deleted Record", record: "R-9003", time: "2026-03-29 10:02", status: "Success" },
+  { id: 4, user: "Nurse Rekha Patil", action: "Viewed Record", record: "R-9004", time: "2026-03-29 10:45", status: "Denied" },
+  { id: 5, user: "Dr. Sunita Nair", action: "Downloaded Record", record: "R-9002", time: "2026-03-29 11:20", status: "Success" },
 ];
-const SPECS = ["Cardiology","Neurology","Orthopaedics","Oncology","Dermatology","Gynaecology","Psychiatry","General Medicine","Paediatrics","Radiology"];
-const DEPTS = ["Cardiology","Neurology","Surgery","Oncology","Skin & Hair","Women Health","Mental Health","General","Paediatrics","Radiology"];
-const ACTION_ICON = { "Viewed Record":"👁", "Login Attempt":"🔑", "Deleted Record":"🗑️", "Downloaded Record":"📥" };
-const TYPE_PILL = { "X-Ray":"bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100", "Prescription":"bg-teal-50 text-teal-700 ring-1 ring-teal-100", "Blood Report":"bg-amber-50 text-amber-700 ring-1 ring-amber-100", "MRI Scan":"bg-purple-50 text-purple-700 ring-1 ring-purple-100" };
+const SPECS = ["Cardiology", "Neurology", "Orthopaedics", "Oncology", "Dermatology", "Gynaecology", "Psychiatry", "General Medicine", "Paediatrics", "Radiology"];
+const DEPTS = ["Cardiology", "Neurology", "Surgery", "Oncology", "Skin & Hair", "Women Health", "Mental Health", "General", "Paediatrics", "Radiology"];
+const ACTION_ICON = { "Viewed Record": "👁", "Login Attempt": "🔑", "Deleted Record": "🗑️", "Downloaded Record": "📥" };
+const TYPE_PILL = { "X-Ray": "bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100", "Prescription": "bg-teal-50 text-teal-700 ring-1 ring-teal-100", "Blood Report": "bg-amber-50 text-amber-700 ring-1 ring-amber-100", "MRI Scan": "bg-purple-50 text-purple-700 ring-1 ring-purple-100" };
 
 // ═══════════════════════════════════════════════════════════════
 // PRIMITIVES
 // ═══════════════════════════════════════════════════════════════
-const Badge = ({ label, color="gray" }) => {
-  const s = { green:"bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200", red:"bg-red-50 text-red-600 ring-1 ring-red-200", yellow:"bg-amber-50 text-amber-700 ring-1 ring-amber-200", blue:"bg-blue-50 text-blue-700 ring-1 ring-blue-200", gray:"bg-slate-100 text-slate-500 ring-1 ring-slate-200", teal:"bg-teal-50 text-teal-700 ring-1 ring-teal-200", purple:"bg-purple-50 text-purple-700 ring-1 ring-purple-200" };
-  return <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide ${s[color]||s.gray}`}>{label}</span>;
+const Badge = ({ label, color = "gray" }) => {
+  const s = { green: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200", red: "bg-red-50 text-red-600 ring-1 ring-red-200", yellow: "bg-amber-50 text-amber-700 ring-1 ring-amber-200", blue: "bg-blue-50 text-blue-700 ring-1 ring-blue-200", gray: "bg-slate-100 text-slate-500 ring-1 ring-slate-200", teal: "bg-teal-50 text-teal-700 ring-1 ring-teal-200", purple: "bg-purple-50 text-purple-700 ring-1 ring-purple-200" };
+  return <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide ${s[color] || s.gray}`}>{label}</span>;
 };
 const Pill = ({ v }) => {
-  if (["Active","Approved","Success"].includes(v))   return <Badge label={v} color="green"/>;
-  if (["Denied","Inactive","Suspended"].includes(v)) return <Badge label={v} color="red"/>;
-  if (["Pending"].includes(v))                       return <Badge label={v} color="yellow"/>;
-  if (["On Leave"].includes(v))                      return <Badge label={v} color="purple"/>;
-  return <Badge label={v} color="gray"/>;
+  if (["Active", "Approved", "Success"].includes(v)) return <Badge label={v} color="green" />;
+  if (["Denied", "Inactive", "Suspended"].includes(v)) return <Badge label={v} color="red" />;
+  if (["Pending"].includes(v)) return <Badge label={v} color="yellow" />;
+  if (["On Leave"].includes(v)) return <Badge label={v} color="purple" />;
+  return <Badge label={v} color="gray" />;
 };
 const Modal = ({ title, onClose, children }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
@@ -117,7 +117,7 @@ const PageHeader = ({ title, sub, action }) => (
 // CHARTS
 // ═══════════════════════════════════════════════════════════════
 const StatCard = ({ icon, label, value, delta, color }) => {
-  const p = { blue:{r:"ring-blue-100",b:"bg-blue-50",t:"text-blue-600"}, teal:{r:"ring-teal-100",b:"bg-teal-50",t:"text-teal-600"}, indigo:{r:"ring-indigo-100",b:"bg-indigo-50",t:"text-indigo-600"}, amber:{r:"ring-amber-100",b:"bg-amber-50",t:"text-amber-600"}, rose:{r:"ring-rose-100",b:"bg-rose-50",t:"text-rose-600"} };
+  const p = { blue: { r: "ring-blue-100", b: "bg-blue-50", t: "text-blue-600" }, teal: { r: "ring-teal-100", b: "bg-teal-50", t: "text-teal-600" }, indigo: { r: "ring-indigo-100", b: "bg-indigo-50", t: "text-indigo-600" }, amber: { r: "ring-amber-100", b: "bg-amber-50", t: "text-amber-600" }, rose: { r: "ring-rose-100", b: "bg-rose-50", t: "text-rose-600" } };
   const c = p[color] || p.blue;
   return (
     <div className="bg-white rounded-2xl p-5 ring-1 ring-slate-100 shadow-sm hover:shadow-md transition-shadow flex items-start gap-4">
@@ -192,21 +192,21 @@ const PageDashboard = ({ setPage }) => {
         </div>
       )}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-        <StatCard icon="👥" label="Total Patients"   value="1,284" delta="+12 this week" color="blue" />
-        <StatCard icon="🩺" label="Total Doctors"    value="86"    delta="4 on leave"    color="teal" />
-        <StatCard icon="📁" label="Active Records"   value="3,541" delta="98% encrypted" color="indigo" />
-        <StatCard icon="🔐" label="Pending Consents" value="14"    delta="3 emergency"   color="amber" />
-        <StatCard icon="🚨" label="Security Alerts"  value="2"     delta="Since midnight" color="rose" />
+        <StatCard icon="👥" label="Total Patients" value="1,284" delta="+12 this week" color="blue" />
+        <StatCard icon="🩺" label="Total Doctors" value="86" delta="4 on leave" color="teal" />
+        <StatCard icon="📁" label="Active Records" value="3,541" delta="98% encrypted" color="indigo" />
+        <StatCard icon="🔐" label="Pending Consents" value="14" delta="3 emergency" color="amber" />
+        <StatCard icon="🚨" label="Security Alerts" value="2" delta="Since midnight" color="rose" />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Sparkline label="Record Access (7d)"  data={[42, 55, 49, 70, 63, 80, 74]} color="#0d9488" />
-        <Sparkline label="Registrations (7d)"  data={[5, 8, 6, 11, 9, 14, 7]}     color="#3b82f6" />
-        <BarChart  label="Access Outcomes (7d)" approved={[8, 12, 7, 15, 10, 13, 9]} denied={[3, 2, 5, 1, 4, 2, 3]} />
+        <Sparkline label="Record Access (7d)" data={[42, 55, 49, 70, 63, 80, 74]} color="#0d9488" />
+        <Sparkline label="Registrations (7d)" data={[5, 8, 6, 11, 9, 14, 7]} color="#3b82f6" />
+        <BarChart label="Access Outcomes (7d)" approved={[8, 12, 7, 15, 10, 13, 9]} denied={[3, 2, 5, 1, 4, 2, 3]} />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[{ icon:"🔒", label:"Encryption",          val:"AES-256 Active",   sub:"All records protected",  color:"text-emerald-600" },
-          { icon:"📋", label:"Pending Approvals",   val:"3 Applications",   sub:"Awaiting admin review",  color:"text-amber-600" },
-          { icon:"🏥", label:"System Uptime",        val:"99.98%",           sub:"Last 30 days",           color:"text-blue-600" }
+        {[{ icon: "🔒", label: "Encryption", val: "AES-256 Active", sub: "All records protected", color: "text-emerald-600" },
+        { icon: "📋", label: "Pending Approvals", val: "3 Applications", sub: "Awaiting admin review", color: "text-amber-600" },
+        { icon: "🏥", label: "System Uptime", val: "99.98%", sub: "Last 30 days", color: "text-blue-600" }
         ].map(({ icon, label, val, sub, color }) => (
           <div key={label} className="bg-white rounded-2xl p-5 ring-1 ring-slate-100 shadow-sm flex items-center gap-4">
             <span className="text-2xl">{icon}</span>
@@ -225,13 +225,13 @@ const PageDashboard = ({ setPage }) => {
 const TabPatients = () => {
   const [rows, setRows] = useState(INIT_PATIENTS);
   const [view, setView] = useState(null);
-  const [add, setAdd]   = useState(false);
-  const [f, setF]       = useState({ name:"", age:"", gender:"M", doctor:"", status:"Active" });
+  const [add, setAdd] = useState(false);
+  const [f, setF] = useState({ name: "", age: "", gender: "M", doctor: "", status: "Active" });
   const toggle = id => setRows(r => r.map(p => p.id === id ? { ...p, status: p.status === "Active" ? "Inactive" : "Active" } : p));
   const handleAdd = () => {
     if (!f.name || !f.age || !f.doctor) return;
-    setRows(r => [...r, { ...f, id:`P-00${50+r.length}`, age:parseInt(f.age), consent:false }]);
-    setAdd(false); setF({ name:"", age:"", gender:"M", doctor:"", status:"Active" });
+    setRows(r => [...r, { ...f, id: `P-00${50 + r.length}`, age: parseInt(f.age), consent: false }]);
+    setAdd(false); setF({ name: "", age: "", gender: "M", doctor: "", status: "Active" });
   };
   return (
     <div>
@@ -239,7 +239,7 @@ const TabPatients = () => {
         action={<button onClick={() => setAdd(true)} className="bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-colors shadow-sm">+ Add Patient</button>} />
       <TCard>
         <table className="w-full">
-          <TH cols={["Patient ID","Name","Doctor","Status","Consent","Actions"]} />
+          <TH cols={["Patient ID", "Name", "Doctor", "Status", "Consent", "Actions"]} />
           <tbody>{rows.map((p, i) => (
             <TR key={p.id} i={i}>
               <TD mono>{p.id}</TD>
@@ -259,7 +259,7 @@ const TabPatients = () => {
       </TCard>
       {view && <Modal title={`Patient — ${view.name}`} onClose={() => setView(null)}>
         <div className="space-y-3 text-sm">
-          {[["ID",view.id],["Age / Gender",`${view.age} / ${view.gender}`],["Assigned Doctor",view.doctor]].map(([k,v]) => (
+          {[["ID", view.id], ["Age / Gender", `${view.age} / ${view.gender}`], ["Assigned Doctor", view.doctor]].map(([k, v]) => (
             <div key={k} className="flex justify-between"><span className="text-slate-400">{k}</span><span className="font-medium text-slate-800">{v}</span></div>
           ))}
           <div className="flex justify-between"><span className="text-slate-400">Status</span><Pill v={view.status} /></div>
@@ -269,13 +269,13 @@ const TabPatients = () => {
       </Modal>}
       {add && <Modal title="Register New Patient" onClose={() => setAdd(false)}>
         <div className="space-y-3">
-          <div><Lbl req>Full Name</Lbl><Inp placeholder="Patient full name" value={f.name} onChange={e => setF({ ...f, name:e.target.value })} /></div>
+          <div><Lbl req>Full Name</Lbl><Inp placeholder="Patient full name" value={f.name} onChange={e => setF({ ...f, name: e.target.value })} /></div>
           <div className="grid grid-cols-2 gap-3">
-            <div><Lbl req>Age</Lbl><Inp type="number" placeholder="Age" value={f.age} onChange={e => setF({ ...f, age:e.target.value })} /></div>
-            <div><Lbl>Gender</Lbl><Sel value={f.gender} onChange={e => setF({ ...f, gender:e.target.value })}><option value="M">Male</option><option value="F">Female</option><option value="O">Other</option></Sel></div>
+            <div><Lbl req>Age</Lbl><Inp type="number" placeholder="Age" value={f.age} onChange={e => setF({ ...f, age: e.target.value })} /></div>
+            <div><Lbl>Gender</Lbl><Sel value={f.gender} onChange={e => setF({ ...f, gender: e.target.value })}><option value="M">Male</option><option value="F">Female</option><option value="O">Other</option></Sel></div>
           </div>
-          <div><Lbl req>Assigned Doctor</Lbl><Sel value={f.doctor} onChange={e => setF({ ...f, doctor:e.target.value })}><option value="">Select doctor…</option>{INIT_DOCTORS.map(d => <option key={d.id}>{d.name}</option>)}</Sel></div>
-          <div><Lbl>Status</Lbl><Sel value={f.status} onChange={e => setF({ ...f, status:e.target.value })}><option>Active</option><option>Inactive</option></Sel></div>
+          <div><Lbl req>Assigned Doctor</Lbl><Sel value={f.doctor} onChange={e => setF({ ...f, doctor: e.target.value })}><option value="">Select doctor…</option>{INIT_DOCTORS.map(d => <option key={d.id}>{d.name}</option>)}</Sel></div>
+          <div><Lbl>Status</Lbl><Sel value={f.status} onChange={e => setF({ ...f, status: e.target.value })}><option>Active</option><option>Inactive</option></Sel></div>
         </div>
         <div className="flex gap-2 mt-5">
           <button onClick={() => setAdd(false)} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-500 text-sm font-semibold hover:bg-slate-50 transition-colors">Cancel</button>
@@ -308,29 +308,29 @@ const TabDoctors = () => {
   const [f, setF] = useState(EMPTY_APP);
 
   // Fetch pending applications
-const fetchApplications = async () => {
-  try {
-    setLoading(true);
-    const res = await fetch("http://localhost:5000/api/auth/applications/pending");
-    const data = await res.json();
-    
-    if (res.ok) {
-      const formattedApps = (data.applications || []).map(app => ({
-        ...app,
-        id: app._id || app.id,                    // Ensure id exists
-        spec: app.specialization || app.spec,     // Normalize field names
-        dept: app.department || app.dept
-      }));
-      setApps(formattedApps);
-    } else {
-      console.error("API Error:", data);
+  const fetchApplications = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("http://localhost:5000/api/auth/applications/pending");
+      const data = await res.json();
+
+      if (res.ok) {
+        const formattedApps = (data.applications || []).map(app => ({
+          ...app,
+          id: app._id || app.id,                    // Ensure id exists
+          spec: app.specialization || app.spec,     // Normalize field names
+          dept: app.department || app.dept
+        }));
+        setApps(formattedApps);
+      } else {
+        console.error("API Error:", data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch applications:", error);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Failed to fetch applications:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   useEffect(() => {
     if (sub === "approve") {
@@ -339,57 +339,57 @@ const fetchApplications = async () => {
   }, [sub]);
 
   // Approve Doctor
-const handleApprove = async (app) => {
-  if (!app) {
-    alert("No application selected");
-    return;
-  }
-
-  const appId = app.id || app._id;   // Support both id and _id
-  console.log("Approving app:", app);
-console.log("Using ID:", appId);
-  if (!appId) {
-    alert("Application ID is missing. Please refresh the page.");
-    console.error("App object:", app);
-    return;
-  }
-
-  try {
-    const res = await fetch(`http://localhost:5000/api/auth/applications/${appId}/approve`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ approvedBy: "Admin Singh" })
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      alert(`✅ ${app.name} has been approved successfully!`);
-
-      // Add to active doctors
-      const newDoctor = {
-        id: `D-${Date.now().toString().slice(-4)}`,
-        name: app.name,
-        spec: app.specialization || app.spec || "General Medicine",
-        dept: app.department || app.dept || "General",
-        email: app.email,
-        phone: app.phone || "",
-        license: app.medicalId || app.license || "",
-        patients: 0,
-        status: "Active"
-      };
-
-      setRows(prev => [...prev, newDoctor]);
-      setApps(prev => prev.filter(a => (a.id || a._id) !== appId));
-      setAppA(null);
-    } else {
-      alert(data.message || "Failed to approve doctor");
+  const handleApprove = async (app) => {
+    if (!app) {
+      alert("No application selected");
+      return;
     }
-  } catch (error) {
-    console.error("Approve error:", error);
-    alert("Server error while approving. Check console for details.");
-  }
-};
+
+    const appId = app.id || app._id;   // Support both id and _id
+    console.log("Approving app:", app);
+    console.log("Using ID:", appId);
+    if (!appId) {
+      alert("Application ID is missing. Please refresh the page.");
+      console.error("App object:", app);
+      return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/auth/applications/${appId}/approve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ approvedBy: "Admin Singh" })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(`✅ ${app.name} has been approved successfully!`);
+
+        // Add to active doctors
+        const newDoctor = {
+          id: `D-${Date.now().toString().slice(-4)}`,
+          name: app.name,
+          spec: app.specialization || app.spec || "General Medicine",
+          dept: app.department || app.dept || "General",
+          email: app.email,
+          phone: app.phone || "",
+          license: app.medicalId || app.license || "",
+          patients: 0,
+          status: "Active"
+        };
+
+        setRows(prev => [...prev, newDoctor]);
+        setApps(prev => prev.filter(a => (a.id || a._id) !== appId));
+        setAppA(null);
+      } else {
+        alert(data.message || "Failed to approve doctor");
+      }
+    } catch (error) {
+      console.error("Approve error:", error);
+      alert("Server error while approving. Check console for details.");
+    }
+  };
 
   // Reject Doctor
   const handleReject = async (app) => {
@@ -399,9 +399,9 @@ console.log("Using ID:", appId);
       const res = await fetch(`http://localhost:5000/api/auth/applications/${app.id}/reject`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           reason: rNote || "Not approved by admin",
-          rejectedBy: "Admin Singh" 
+          rejectedBy: "Admin Singh"
         })
       });
 
@@ -423,26 +423,26 @@ console.log("Using ID:", appId);
 
   return (
     <div>
-      <PageHeader 
-        title="Doctor Management" 
-        sub={`${rows.length} active doctors · ${pendingCount} pending applications`} 
+      <PageHeader
+        title="Doctor Management"
+        sub={`${rows.length} active doctors · ${pendingCount} pending applications`}
       />
 
-      <TabBar 
-        active={sub} 
-        onChange={setSub} 
+      <TabBar
+        active={sub}
+        onChange={setSub}
         tabs={[
-          { id:"active",   icon:"🩺", label:"Active Doctors" },
-          { id:"register", icon:"➕", label:"New Doctor Application" },
-          { id:"approve",  icon:"📋", label:"Approve Applications", badge: pendingCount },
-        ]} 
+          { id: "active", icon: "🩺", label: "Active Doctors" },
+          { id: "register", icon: "➕", label: "New Doctor Application" },
+          { id: "approve", icon: "📋", label: "Approve Applications", badge: pendingCount },
+        ]}
       />
 
       {/* Active Doctors */}
       {sub === "active" && (
         <TCard>
           <table className="w-full">
-            <TH cols={["Doctor ID","Name & Email","Specialization","Dept","Patients","Status","Actions"]} />
+            <TH cols={["Doctor ID", "Name & Email", "Specialization", "Dept", "Patients", "Status", "Actions"]} />
             <tbody>
               {rows.map((d, i) => (
                 <TR key={d.id} i={i}>   {/* ← Fixed: added key */}
@@ -527,7 +527,7 @@ console.log("Using ID:", appId);
             <button onClick={() => { setF(EMPTY_APP); setErr(""); }} className="px-6 py-3 border rounded-xl text-slate-500 hover:bg-slate-50">
               Clear
             </button>
-            <button 
+            <button
               onClick={handleSubmitApplication}
               disabled={loading}
               className="flex-1 py-3 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 disabled:opacity-70"
@@ -617,15 +617,15 @@ console.log("Using ID:", appId);
 
 const TabRecords = () => {
   const [typeF, setTypeF] = useState("All");
-  const types = ["All","X-Ray","Prescription","Blood Report","MRI Scan"];
+  const types = ["All", "X-Ray", "Prescription", "Blood Report", "MRI Scan"];
   const data = typeF === "All" ? INIT_RECORDS : INIT_RECORDS.filter(r => r.type === typeF);
   return (
     <div>
       <PageHeader title="Medical Records" sub={`${data.length} records`}
-        action={<div className="flex gap-1.5 flex-wrap">{types.map(t => <button key={t} onClick={() => setTypeF(t)} className={`text-xs px-3 py-1.5 rounded-xl font-semibold transition-all ${typeF===t?"bg-teal-600 text-white shadow-sm":"bg-white text-slate-500 ring-1 ring-slate-200 hover:ring-teal-300"}`}>{t}</button>)}</div>} />
+        action={<div className="flex gap-1.5 flex-wrap">{types.map(t => <button key={t} onClick={() => setTypeF(t)} className={`text-xs px-3 py-1.5 rounded-xl font-semibold transition-all ${typeF === t ? "bg-teal-600 text-white shadow-sm" : "bg-white text-slate-500 ring-1 ring-slate-200 hover:ring-teal-300"}`}>{t}</button>)}</div>} />
       <TCard>
         <table className="w-full">
-          <TH cols={["Record ID","Patient","Type","Uploaded By","Date","Encrypted","Actions"]} />
+          <TH cols={["Record ID", "Patient", "Type", "Uploaded By", "Date", "Encrypted", "Actions"]} />
           <tbody>{data.map((r, i) => (
             <TR key={r.id} i={i}>
               <TD mono>{r.id}</TD>
@@ -648,10 +648,10 @@ const PagePeople = () => {
   return (
     <div>
       <div className="mb-6"><h1 className="text-xl font-bold text-slate-800">People & Records</h1><p className="text-xs text-slate-400 mt-0.5">Manage patients, doctors, and medical records</p></div>
-      <TabBar active={tab} onChange={setTab} tabs={[{ id:"patients", icon:"👥", label:"Patients" }, { id:"doctors", icon:"🩺", label:"Doctors" }, { id:"records", icon:"📁", label:"Medical Records" }]} />
+      <TabBar active={tab} onChange={setTab} tabs={[{ id: "patients", icon: "👥", label: "Patients" }, { id: "doctors", icon: "🩺", label: "Doctors" }, { id: "records", icon: "📁", label: "Medical Records" }]} />
       {tab === "patients" && <TabPatients />}
-      {tab === "doctors"  && <TabDoctors />}
-      {tab === "records"  && <TabRecords />}
+      {tab === "doctors" && <TabDoctors />}
+      {tab === "records" && <TabRecords />}
     </div>
   );
 };
@@ -674,7 +674,7 @@ const TabAccess = () => {
   const [temp, setTemp] = useState(null);
   const [dur, setDur] = useState("1 Hour");
 
-  const FILTERS = ["All","Doctor","Nurse","External","Emergency","Normal"];
+  const FILTERS = ["All", "Doctor", "Nurse", "External", "Emergency", "Normal"];
 
   const data =
     filter === "All"
@@ -715,11 +715,10 @@ const TabAccess = () => {
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`text-xs px-3 py-1.5 rounded-xl font-semibold transition-all ${
-              filter === f
+            className={`text-xs px-3 py-1.5 rounded-xl font-semibold transition-all ${filter === f
                 ? "bg-teal-600 text-white"
                 : "bg-white text-slate-500 ring-1 ring-slate-200"
-            }`}
+              }`}
           >
             {f}
           </button>
@@ -731,16 +730,14 @@ const TabAccess = () => {
         {data.map(a => (
           <div
             key={a.id}
-            className={`bg-white rounded-2xl p-5 ring-1 shadow-sm flex items-center gap-4 ${
-              a.type === "Emergency"
+            className={`bg-white rounded-2xl p-5 ring-1 shadow-sm flex items-center gap-4 ${a.type === "Emergency"
                 ? "ring-rose-200 bg-rose-50/20"
                 : "ring-slate-100"
-            }`}
+              }`}
           >
             <div
-              className={`w-1 self-stretch rounded-full ${
-                a.type === "Emergency" ? "bg-rose-400" : "bg-teal-400"
-              }`}
+              className={`w-1 self-stretch rounded-full ${a.type === "Emergency" ? "bg-rose-400" : "bg-teal-400"
+                }`}
             />
 
             {/* Info */}
@@ -756,8 +753,8 @@ const TabAccess = () => {
                     a.role === "Doctor"
                       ? "blue"
                       : a.role === "Nurse"
-                      ? "teal"
-                      : "purple"
+                        ? "teal"
+                        : "purple"
                   }
                 />
 
@@ -907,12 +904,12 @@ const TabAccess = () => {
 const TabEmergency = () => {
   const [logs, setLogs] = useState(INIT_EMERGENCY);
   const [modal, setModal] = useState(false);
-  const [f, setF] = useState({ patient:"", duration:"30 Minutes", reason:"" });
+  const [f, setF] = useState({ patient: "", duration: "30 Minutes", reason: "" });
   const [err, setErr] = useState("");
   const handleOverride = () => {
     if (!f.patient || !f.reason.trim()) { setErr("Select a patient and provide justification."); return; }
-    setLogs(l => [{ id:`E-0${l.length+1}`, triggeredBy:"Admin Singh", patient:f.patient, duration:f.duration, time:new Date().toISOString().slice(0,16).replace("T"," "), active:true }, ...l]);
-    setModal(false); setF({ patient:"", duration:"30 Minutes", reason:"" }); setErr("");
+    setLogs(l => [{ id: `E-0${l.length + 1}`, triggeredBy: "Admin Singh", patient: f.patient, duration: f.duration, time: new Date().toISOString().slice(0, 16).replace("T", " "), active: true }, ...l]);
+    setModal(false); setF({ patient: "", duration: "30 Minutes", reason: "" }); setErr("");
   };
   return (
     <div>
@@ -924,8 +921,8 @@ const TabEmergency = () => {
       </div>
       <div className="space-y-3">
         {logs.map(e => (
-          <div key={e.id} className={`bg-white rounded-2xl p-5 ring-1 shadow-sm flex items-center gap-4 ${e.active?"ring-rose-200 bg-rose-50/20":"ring-slate-100"}`}>
-            <div className={`w-3 h-3 rounded-full flex-shrink-0 ${e.active?"bg-rose-500 animate-pulse":"bg-slate-200"}`} />
+          <div key={e.id} className={`bg-white rounded-2xl p-5 ring-1 shadow-sm flex items-center gap-4 ${e.active ? "ring-rose-200 bg-rose-50/20" : "ring-slate-100"}`}>
+            <div className={`w-3 h-3 rounded-full flex-shrink-0 ${e.active ? "bg-rose-500 animate-pulse" : "bg-slate-200"}`} />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1"><span className="font-semibold text-slate-800 text-sm">{e.triggeredBy}</span>{e.active && <span className="text-[9px] font-black bg-rose-100 text-rose-600 px-1.5 py-0.5 rounded-full animate-pulse">LIVE</span>}</div>
               <p className="text-xs text-slate-500">Patient: <span className="font-medium text-slate-700">{e.patient}</span></p>
@@ -939,9 +936,9 @@ const TabEmergency = () => {
         <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 mb-4">This bypasses all standard restrictions and is <strong>permanently logged</strong> for compliance.</div>
         {err && <div className="mb-3 p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-700">{err}</div>}
         <div className="space-y-3">
-          <div><Lbl req>Patient Record</Lbl><Sel value={f.patient} onChange={e => setF({ ...f, patient:e.target.value })}><option value="">Select patient…</option>{INIT_PATIENTS.map(p => <option key={p.id}>{p.id} — {p.name}</option>)}</Sel></div>
-          <div><Lbl>Duration</Lbl><Sel value={f.duration} onChange={e => setF({ ...f, duration:e.target.value })}>{["30 Minutes","1 Hour","2 Hours"].map(o => <option key={o}>{o}</option>)}</Sel></div>
-          <div><Lbl req>Clinical Justification</Lbl><textarea rows={3} value={f.reason} onChange={e => setF({ ...f, reason:e.target.value })} placeholder="Describe the emergency clearly…" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-rose-300 placeholder:text-slate-300" /></div>
+          <div><Lbl req>Patient Record</Lbl><Sel value={f.patient} onChange={e => setF({ ...f, patient: e.target.value })}><option value="">Select patient…</option>{INIT_PATIENTS.map(p => <option key={p.id}>{p.id} — {p.name}</option>)}</Sel></div>
+          <div><Lbl>Duration</Lbl><Sel value={f.duration} onChange={e => setF({ ...f, duration: e.target.value })}>{["30 Minutes", "1 Hour", "2 Hours"].map(o => <option key={o}>{o}</option>)}</Sel></div>
+          <div><Lbl req>Clinical Justification</Lbl><textarea rows={3} value={f.reason} onChange={e => setF({ ...f, reason: e.target.value })} placeholder="Describe the emergency clearly…" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-rose-300 placeholder:text-slate-300" /></div>
         </div>
         <div className="flex gap-2 mt-5">
           <button onClick={() => { setModal(false); setErr(""); }} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-500 text-sm font-semibold hover:bg-slate-50 transition-colors">Cancel</button>
@@ -959,12 +956,12 @@ const TabAudit = () => {
     <div>
       <PageHeader title="Audit Logs" sub="Immutable security and access log"
         action={<div className="flex items-center gap-2">
-          {["All","Success","Denied"].map(f => <button key={f} onClick={() => setFilter(f)} className={`text-xs px-3.5 py-1.5 rounded-xl font-semibold transition-all ${filter===f?"bg-teal-600 text-white shadow-sm":"bg-white text-slate-500 ring-1 ring-slate-200 hover:ring-teal-300"}`}>{f}</button>)}
+          {["All", "Success", "Denied"].map(f => <button key={f} onClick={() => setFilter(f)} className={`text-xs px-3.5 py-1.5 rounded-xl font-semibold transition-all ${filter === f ? "bg-teal-600 text-white shadow-sm" : "bg-white text-slate-500 ring-1 ring-slate-200 hover:ring-teal-300"}`}>{f}</button>)}
           <button className="text-xs px-3.5 py-1.5 rounded-xl font-semibold bg-white text-slate-500 ring-1 ring-slate-200 hover:ring-slate-300 transition-all">📥 Export</button>
         </div>} />
       <TCard>
         <table className="w-full">
-          <TH cols={["#","User / IP","Action","Record","Timestamp","Status"]} />
+          <TH cols={["#", "User / IP", "Action", "Record", "Timestamp", "Status"]} />
           <tbody>{data.map((l, i) => (
             <TR key={l.id} i={i}>
               <TD mono>{l.id}</TD>
@@ -986,14 +983,14 @@ const TabAudit = () => {
 };
 
 const TabSettings = () => {
-  const [enc, setEnc]     = useState(true);
-  const [tls, setTls]     = useState(true);
+  const [enc, setEnc] = useState(true);
+  const [tls, setTls] = useState(true);
   const [purge, setPurge] = useState(true);
-  const [ret, setRet]     = useState("7 Years");
-  const ROLES = [{ name:"Admin", desc:"Full system access", color:"blue" }, { name:"Doctor", desc:"Own patients & records only", color:"teal" }, { name:"Nurse", desc:"Assigned ward access", color:"purple" }, { name:"Patient", desc:"Own records only", color:"gray" }];
-  const ADMINS = [{ name:"Admin Singh", role:"Super Admin", init:"AS", grad:"from-blue-400 to-indigo-500" }, { name:"Dr. Auth Kumar", role:"IT Admin", init:"AK", grad:"from-teal-400 to-cyan-500" }];
+  const [ret, setRet] = useState("7 Years");
+  const ROLES = [{ name: "Admin", desc: "Full system access", color: "blue" }, { name: "Doctor", desc: "Own patients & records only", color: "teal" }, { name: "Nurse", desc: "Assigned ward access", color: "purple" }, { name: "Patient", desc: "Own records only", color: "gray" }];
+  const ADMINS = [{ name: "Admin Singh", role: "Super Admin", init: "AS", grad: "from-blue-400 to-indigo-500" }, { name: "Dr. Auth Kumar", role: "IT Admin", init: "AK", grad: "from-teal-400 to-cyan-500" }];
   const Card = ({ title, icon, children }) => <div className="bg-white rounded-2xl p-6 ring-1 ring-slate-100 shadow-sm"><h3 className="text-sm font-bold text-slate-700 flex items-center gap-2 pb-4 mb-4 border-b border-slate-50"><span>{icon}</span>{title}</h3><div className="space-y-4">{children}</div></div>;
-  const Row  = ({ label, sub, right }) => <div className="flex items-center justify-between gap-4"><div className="min-w-0"><p className="text-sm font-medium text-slate-700">{label}</p>{sub && <p className="text-[11px] text-slate-400 mt-0.5">{sub}</p>}</div><div className="flex-shrink-0">{right}</div></div>;
+  const Row = ({ label, sub, right }) => <div className="flex items-center justify-between gap-4"><div className="min-w-0"><p className="text-sm font-medium text-slate-700">{label}</p>{sub && <p className="text-[11px] text-slate-400 mt-0.5">{sub}</p>}</div><div className="flex-shrink-0">{right}</div></div>;
   return (
     <div>
       <div className="mb-5"><h2 className="text-lg font-bold text-slate-800">System Settings</h2><p className="text-xs text-slate-400 mt-0.5">Security, privacy and access configuration</p></div>
@@ -1001,12 +998,12 @@ const TabSettings = () => {
         <Card title="Encryption" icon="🔐">
           <Row label="AES-256 Record Encryption" sub="All medical records encrypted at rest" right={<Toggle on={enc} onToggle={() => setEnc(!enc)} />} />
           <Row label="TLS 1.3 in Transit" sub="Secure data transfer layer" right={<Toggle on={tls} onToggle={() => setTls(!tls)} />} />
-          <div className="pt-3 border-t border-slate-50 flex items-center gap-2"><div className={`w-2 h-2 rounded-full ${enc?"bg-emerald-400":"bg-rose-400"}`} /><span className="text-xs text-slate-600 font-medium">{enc?"All records protected (AES-256)":"⚠ Records currently unprotected"}</span></div>
+          <div className="pt-3 border-t border-slate-50 flex items-center gap-2"><div className={`w-2 h-2 rounded-full ${enc ? "bg-emerald-400" : "bg-rose-400"}`} /><span className="text-xs text-slate-600 font-medium">{enc ? "All records protected (AES-256)" : "⚠ Records currently unprotected"}</span></div>
         </Card>
         <Card title="Data Retention" icon="🗄️">
-          <Row label="Retention Period" sub="Minimum required by regulatory policy" right={<select value={ret} onChange={e => setRet(e.target.value)} className="border border-slate-200 rounded-xl px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-300 bg-white">{["5 Years","7 Years","10 Years"].map(o => <option key={o}>{o}</option>)}</select>} />
+          <Row label="Retention Period" sub="Minimum required by regulatory policy" right={<select value={ret} onChange={e => setRet(e.target.value)} className="border border-slate-200 rounded-xl px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-300 bg-white">{["5 Years", "7 Years", "10 Years"].map(o => <option key={o}>{o}</option>)}</select>} />
           <Row label="Auto-purge on Expiry" sub="Permanently delete records past retention date" right={<Toggle on={purge} onToggle={() => setPurge(!purge)} />} />
-          <div className="pt-3 border-t border-slate-50 flex gap-2"><Badge label={`${ret} retention`} color="blue" /><Badge label={purge?"Auto-purge on":"Manual purge"} color={purge?"green":"yellow"} /></div>
+          <div className="pt-3 border-t border-slate-50 flex gap-2"><Badge label={`${ret} retention`} color="blue" /><Badge label={purge ? "Auto-purge on" : "Manual purge"} color={purge ? "green" : "yellow"} /></div>
         </Card>
         <Card title="Role-Based Access (RBAC)" icon="👥">
           {ROLES.map(r => <div key={r.name} className="flex items-center justify-between gap-4"><div className="flex items-center gap-2"><Badge label={r.name} color={r.color} /><span className="text-[11px] text-slate-400">{r.desc}</span></div><button className="text-xs font-semibold text-teal-600 hover:text-teal-800 hover:underline transition-colors flex-shrink-0">Configure</button></div>)}
@@ -1026,15 +1023,15 @@ const PageSecurity = () => {
     <div>
       <div className="mb-6"><h1 className="text-xl font-bold text-slate-800">Security & Operations</h1><p className="text-xs text-slate-400 mt-0.5">Access control, emergency overrides, audit logs, and system settings</p></div>
       <TabBar active={tab} onChange={setTab} tabs={[
-        { id:"access",    icon:"🔐", label:"Access Monitor" },
-        { id:"emergency", icon:"🚨", label:"Emergency" },
-        { id:"audit",     icon:"📜", label:"Audit Logs" },
-        { id:"settings",  icon:"⚙️", label:"Settings" },
+        { id: "access", icon: "🔐", label: "Access Monitor" },
+        { id: "emergency", icon: "🚨", label: "Emergency" },
+        { id: "audit", icon: "📜", label: "Audit Logs" },
+        { id: "settings", icon: "⚙️", label: "Settings" },
       ]} />
-      {tab === "access"    && <TabAccess />}
+      {tab === "access" && <TabAccess />}
       {tab === "emergency" && <TabEmergency />}
-      {tab === "audit"     && <TabAudit />}
-      {tab === "settings"  && <TabSettings />}
+      {tab === "audit" && <TabAudit />}
+      {tab === "settings" && <TabSettings />}
     </div>
   );
 };
@@ -1043,18 +1040,18 @@ const PageSecurity = () => {
 // SHELL
 // ═══════════════════════════════════════════════════════════════
 const NAV = [
-  { id:"dashboard", icon:"📊", label:"Dashboard" },
-  { id:"people",    icon:"👥", label:"People & Records", badge:3 },
-  { id:"security",  icon:"🔐", label:"Security & Ops",   badge:14 },
+  { id: "dashboard", icon: "📊", label: "Dashboard" },
+  { id: "people", icon: "👥", label: "People & Records", badge: 3 },
+  { id: "security", icon: "🔐", label: "Security & Ops", badge: 14 },
 ];
 const NOTIFS = [
-  { type:"alert", msg:"Unauthorized login — IP 192.168.4.21", time:"09:31 AM" },
-  { type:"warn",  msg:"14 pending consent requests",          time:"08:00 AM" },
-  { type:"alert", msg:"Emergency override by Dr. F. Zaidi",  time:"Yesterday" },
+  { type: "alert", msg: "Unauthorized login — IP 192.168.4.21", time: "09:31 AM" },
+  { type: "warn", msg: "14 pending consent requests", time: "08:00 AM" },
+  { type: "alert", msg: "Emergency override by Dr. F. Zaidi", time: "Yesterday" },
 ];
 
 export default function HealthcareAdminDashboard() {
-  const [page, setPage]   = useState("dashboard");
+  const [page, setPage] = useState("dashboard");
   const [notif, setNotif] = useState(false);
 
   return (
@@ -1069,8 +1066,8 @@ export default function HealthcareAdminDashboard() {
           <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest px-3 mb-3">Navigation</p>
           {NAV.map(n => (
             <button key={n.id} onClick={() => setPage(n.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${page===n.id?"bg-teal-50 text-teal-700 ring-1 ring-teal-100 shadow-sm":"text-slate-500 hover:bg-slate-50 hover:text-slate-700"}`}>
-              <span className={`text-base transition-transform ${page===n.id?"scale-110":""}`}>{n.icon}</span>
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${page === n.id ? "bg-teal-50 text-teal-700 ring-1 ring-teal-100 shadow-sm" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"}`}>
+              <span className={`text-base transition-transform ${page === n.id ? "scale-110" : ""}`}>{n.icon}</span>
               <span className="flex-1 text-left truncate">{n.label}</span>
               {n.badge && <span className="bg-amber-100 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full">{n.badge}</span>}
               {page === n.id && <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />}
@@ -1107,8 +1104,8 @@ export default function HealthcareAdminDashboard() {
                   </div>
                   {NOTIFS.map((n, i) => (
                     <div key={i} className="px-4 py-3 border-b border-slate-50 hover:bg-slate-50 cursor-pointer flex gap-3">
-                      <span className="flex-shrink-0 mt-0.5">{n.type==="alert"?"🚨":"⚠️"}</span>
-                      <div><p className={`text-xs font-medium ${n.type==="alert"?"text-rose-700":"text-amber-700"}`}>{n.msg}</p><p className="text-[10px] text-slate-400 mt-0.5">{n.time}</p></div>
+                      <span className="flex-shrink-0 mt-0.5">{n.type === "alert" ? "🚨" : "⚠️"}</span>
+                      <div><p className={`text-xs font-medium ${n.type === "alert" ? "text-rose-700" : "text-amber-700"}`}>{n.msg}</p><p className="text-[10px] text-slate-400 mt-0.5">{n.time}</p></div>
                     </div>
                   ))}
                   <div className="px-4 py-2.5 text-center"><button className="text-xs text-teal-600 font-semibold hover:underline">View all</button></div>
@@ -1124,8 +1121,8 @@ export default function HealthcareAdminDashboard() {
         </header>
         <main className="flex-1 p-6 overflow-y-auto">
           {page === "dashboard" && <PageDashboard setPage={setPage} />}
-          {page === "people"    && <PagePeople />}
-          {page === "security"  && <PageSecurity />}
+          {page === "people" && <PagePeople />}
+          {page === "security" && <PageSecurity />}
         </main>
       </div>
     </div>

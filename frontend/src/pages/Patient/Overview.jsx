@@ -1,24 +1,32 @@
 import { useState, useEffect } from "react";
-import { getRecords, getRequests, getLogs } from "../../services/api";
+import { getRecords, getRequests, getLogs, getProfile } from "../../services/api";
 import { useNavigate } from "react-router-dom";
 
 export default function Overview() {
   const navigate = useNavigate();
-  
+
   const [stats, setStats] = useState({ records: 0, requests: 0, logs: 0 });
-  const [userName] = useState("Nitisha Sharma"); // You can make this dynamic later
+  const [userName, setUserName] = useState("");
+  // , getLogs()
 
   useEffect(() => {
-    Promise.all([getRecords(), getRequests(), getLogs()])
-      .then(([rec, req, logs]) => {
-        setStats({
-          records: rec.data?.length || 0,
-          requests: req.data?.length || 0,
-          logs: logs.data?.length || 0,
-        });
-      })
-      .catch(err => console.error("Error fetching data:", err));
-  }, []);
+  Promise.all([getRecords(), getRequests(), getProfile()])
+    .then(([rec, req, profile]) => {
+
+      const recordsData = rec?.data || [];
+      const requestsData = req?.data || [];
+
+      setStats({
+        records: recordsData.length,
+        requests: requestsData.length,
+        logs: 0,
+      });
+
+      setUserName(profile?.data?.name || "User");
+
+    })
+    .catch(err => console.error("Error fetching data:", err));
+}, []);
 
   const menuItems = [
     { label: "Upload Records", path: "/dashboard/upload", icon: "📤" },
@@ -30,7 +38,7 @@ export default function Overview() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6">
-      
+
       {/* Top Navigation Bar */}
       <div className="flex justify-between items-center mb-10 bg-white dark:bg-slate-800 rounded-3xl px-8 py-5 shadow-sm">
         <div className="flex items-center gap-4">

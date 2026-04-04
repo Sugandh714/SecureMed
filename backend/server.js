@@ -8,6 +8,9 @@ import mongoose from "mongoose";
 
 import cors from "cors";
 import recordRoutes from "./routes/recordRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js";
+
+import requestRoutes from "./routes/requestRoutes.js";
 import { 
   register, 
   login,
@@ -25,9 +28,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
-console.log("ENV CHECK:");
-console.log("PINATA_API_KEY:", process.env.PINATA_API_KEY);
-console.log("PINATA_SECRET:", process.env.PINATA_SECRET_API_KEY);
+
 app.use("/api/records", recordRoutes);
 
 /* ================= DATABASE ================= */
@@ -86,11 +87,14 @@ app.post("/api/auth/applications/:id/reject", async (req, res) => {
     res.status(500).json({ message: "Rejection error", error: err.message });
   }
 });*/
-
-/* ================= TEST ROUTE ================= */
-app.get("/", (req, res) => {
-  res.send("HealthAdmin API is running...");
-});
+app.use("/api/profile", profileRoutes);
+app.use("/api/records", recordRoutes);
+app.use("/api/requests", requestRoutes);
+// app.use("/api/logs", logRoutes);
+// /* ================= TEST ROUTE ================= */
+// app.get("/", (req, res) => {
+//   res.send("HealthAdmin API is running...");
+// });
 
 /* ================= START SERVER ================= */
 const PORT = process.env.PORT || 5000;

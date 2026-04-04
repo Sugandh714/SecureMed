@@ -2,11 +2,26 @@
 // src/services/api.js
 const API_BASE = "http://localhost:5000/api";
 
+// const apiCall = async (endpoint, options = {}) => {
+//   const response = await fetch(`${API_BASE}${endpoint}`, {
+//     headers: { "Content-Type": "application/json" },
+//     ...options,
+//   });
+//   const data = await response.json();
+//   if (!response.ok) throw new Error(data.message || "API Error");
+//   return data;
+// };
 const apiCall = async (endpoint, options = {}) => {
+  const token = localStorage.getItem("token");
+
   const response = await fetch(`${API_BASE}${endpoint}`, {
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
     ...options,
   });
+
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "API Error");
   return data;
@@ -25,3 +40,7 @@ export const updateRequestStatus = (id, status) =>
 
 // Logs
 export const getLogs = () => apiCall("/logs");
+
+//profile
+// Profile
+export const getProfile = () => apiCall("/profile");
