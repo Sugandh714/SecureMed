@@ -76,8 +76,8 @@ export default function Settings() {
             NS
           </div>
           <div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: "#111" }}>Nitisha Sharma</div>
-            <div style={{ fontSize: 13, color: "#9ca3af", marginTop: 2 }}>nitisha.sharma@email.com</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: "#111" }}>user</div>
+            <div style={{ fontSize: 13, color: "#9ca3af", marginTop: 2 }}>user@gmail.com</div>
             <div style={{
               display: "inline-block", marginTop: 6,
               padding: "3px 10px", borderRadius: 99,
@@ -90,8 +90,8 @@ export default function Settings() {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <InputField label="Full Name" defaultValue="Nitisha Sharma" />
-          <InputField label="Email Address" type="email" defaultValue="nitisha.sharma@email.com" />
+          <InputField label="Full Name" defaultValue="user" />
+          <InputField label="Email Address" type="email" defaultValue="user@gmail.com" />
           <InputField label="Phone Number" defaultValue="+91 98765 43210" />
         </div>
       </Section>

@@ -2,8 +2,8 @@
 import { Routes, Route, Outlet } from "react-router-dom";
 
 // Context Providers
-import { ThemeProvider } from "./context/ThemeContext";
-import { DataProvider } from "./context/DataContext";        // Keep if you're using it
+import { ThemeProvider } from "./Context/ThemeContext";
+import { DataProvider } from "./Context/DataContext";        // Keep if you're using it
 
 
 
