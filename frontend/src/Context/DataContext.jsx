@@ -16,7 +16,7 @@ export const DataProvider = ({ children }) => {
   ]);
 
   const [logs, setLogs] = useState([
-    { time: "Mar 28, 2026 • 5:15 PM", action: "Record Uploaded", actor: "Nitisha Sharma", detail: "Annual Blood Panel" },
+    { time: "Mar 28, 2026 • 5:15 PM", action: "Record Uploaded", actor: "User", detail: "Annual Blood Panel" },
     { time: "Mar 27, 2026 • 11:45 AM", action: "Access Granted", actor: "You → Dr. Meena Gupta", detail: "ECG Report" },
   ]);
 
@@ -27,7 +27,7 @@ export const DataProvider = ({ children }) => {
     setLogs(prev => [{
       time: "Just now",
       action: "Record Uploaded",
-      actor: "Nitisha Sharma",
+      actor: "User",
       detail: newRecord.name
     }, ...prev]);
   };
